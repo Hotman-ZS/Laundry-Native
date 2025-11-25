@@ -5,7 +5,8 @@
 // require;
 // require_once 'config/koneksi.php';
 
-$query = mysqli_query($config, "SELECT * FROM users u ORDER BY u.id DESC");
+$query = mysqli_query($config, "SELECT l.name as level_name, u.* FROM users u
+LEFT JOIN levels l ON l.id = u.level_id ORDER BY u.id DESC");
 $users = mysqli_fetch_all($query, MYSQLI_ASSOC);
 
 // disini parameter delete
@@ -36,6 +37,7 @@ if (isset($_GET['delete'])) {
           <thead>
             <tr>
               <th>No</th>
+              <th>Level</th>
               <th>Name</th>
               <th>Email</th>
               <th></th>
@@ -45,6 +47,7 @@ if (isset($_GET['delete'])) {
             <?php foreach ($users as $key => $value): ?>
               <tr>
                 <td><?php echo $key += 1 ?></td>
+                <td><?php echo $value['level_name'] ?></td>
                 <td><?php echo $value['name'] ?></td>
                 <td><?php echo $value['email'] ?></td>
                 <td>

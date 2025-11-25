@@ -5,8 +5,36 @@ include 'inc/functions.php';
 include 'config/config.php';
 
 checkLogin();
-?>
 
+// login sbg operator, cuma bisa buka menu transaksi
+// operator mencoba ganti dari URL
+
+
+// $currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
+
+
+// $level_id = $_SESSION['LEVEL_ID'] ?? '' ;
+
+// $query = mysqli_query($config, "SELECT * FROM menus 
+// JOIN level_menus ON level_menus.menu_id = menus.id WHERE level_id = '$level_id' ");
+// $rows = mysqli_fetch_all($query, MYSQLI_ASSOC);
+
+// $allowed_role = false;
+
+// foreach($rows as $row) {
+//   if($row['link'] == $currentPage) {
+//     $allowed_role = true;
+//     break;
+//   }
+// }
+
+//   if(!$allowed_role) {
+//     echo "<h1 class='center'>Access Failed!!</h1>";
+//     echo "anda tidak memiliki hak akses ke halaman ini" . ucfirst($currentPage);
+//     echo "<a href='home.php?page=dashboard'>Back to Dashboard</a>";
+//     exit;
+//   }
+?>
 <!DOCTYPE html>
 <html lang="en">
 

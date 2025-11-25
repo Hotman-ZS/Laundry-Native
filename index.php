@@ -19,11 +19,12 @@ if (isset($_POST['login'])) {
     $user = mysqli_fetch_assoc($query);
     // jika pasword yang di input sama dengan yang ada ditable
     // --- : a == a, a = 1 a(var)===a(var)
-    if ($sha1 == $user['password']) {
+    if ($sha1 === $user['password']) {
       // echo $password;
       // echo "aaaaaaaaaaaaaaaaaaaaa";
       $_SESSION['ID'] = $user['id'];
       $_SESSION['NAME'] = $user['name'];
+      $_SESSION['LEVEL_ID'] = $user['level_id'];
       header("location:home.php");
     }
   } else {
