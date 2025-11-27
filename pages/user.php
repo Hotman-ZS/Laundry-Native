@@ -29,9 +29,6 @@ if (isset($_GET['delete'])) {
           <a href="?page=tambah-user" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Add User
           </a>
-          <a href="?page=user-restore" class="btn btn-primary">
-            <i class="bi bi-arrow-counterclockwise"></i> Restore user
-          </a>
         </div>
         <table class="table table-bordered table-striped datatable">
           <thead>

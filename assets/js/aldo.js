@@ -89,72 +89,98 @@
 // card.appendChild(p);
 // // foreach($buttons as $btn){}
 
-let currentCategory = 'all';
+// let currentCategory = 'all';
 
-function filterCategory(category, event) {
-  currentCategory = category;
+// function filterCategory(category, event) {
+//   currentCategory = category;
 
-  let buttons = document.querySelectorAll('.category-btn');
-  buttons.forEach((btn) => {
-    btn.classList.remove('active');
-    btn.classList.remove('btn-primary');
-    btn.classList.add('btn-outline-primary');
-  });
-  event.classList.add('active');
-  event.classList.remove('btn-outline-primary');
-  event.classList.add('btn-primary');
-  console.log({
-    currentCategory: currentCategory,
-    category: category,
-    event: event,
-  });
+//   let buttons = document.querySelectorAll('.category-btn');
+//   buttons.forEach((btn) => {
+//     btn.classList.remove('active');
+//     btn.classList.remove('btn-primary');
+//     btn.classList.add('btn-outline-primary');
+//   });
+//   event.classList.add('active');
+//   event.classList.remove('btn-outline-primary');
+//   event.classList.add('btn-primary');
+//   console.log({
+//     currentCategory: currentCategory,
+//     category: category,
+//     event: event,
+//   });
 
-  renderProducts();
-}
+//   renderProducts();
+// }
 
-function renderProducts(searchProduct = '') {
-  const productGrid = document.getElementById('productGrid');
-  productGrid.innerHTML = '';
+// function renderProducts(searchProduct = '') {
+//   const productGrid = document.getElementById('productGrid');
+//   productGrid.innerHTML = '';
 
-  // filter
-  const filtered = products.filter((p) => {
-    // shorthand / ternary
-    const matchCategory =
-      currentCategory === 'all' || p.category_name === currentCategory;
-    const matchSearch = p.product_name.toLowerCase().includes(searchProduct);
-    return matchCategory && matchSearch;
-  });
+//   // filter
+//   const filtered = products.filter((p) => {
+//     // shorthand / ternary
+//     const matchCategory =
+//       currentCategory === 'all' || p.category_name === currentCategory;
+//     const matchSearch = p.product_name.toLowerCase().includes(searchProduct);
+//     return matchCategory && matchSearch;
+//   });
 
-  // munculin data dari table products
-  filtered.forEach((product) => {
-    const col = document.createElement('div');
-    col.className = 'col-md-4 col-sm-6';
-    col.innerHTML = `<div class="card product-card" onclick="addToCart(${product.id})">
+//   // munculin data dari table products
+//   filtered.forEach((product) => {
+//     const col = document.createElement('div');
+//     col.className = 'col-md-4 col-sm-6';
+//     col.innerHTML = `<div class="card product-card" onclick="addToCart(${product.id})">
 
-        <div class="product-img">
-          <img class="w-100" src="../${product.product_photo}" alt="" width="100%">
-        </div>
-        <div class="card-body">
-          <span class="badge bg-secondary badge-category">${product.category_name}</span>
-          <h6 class="card-title mt-2 mb-2">${product.product_name}</h6>
-          <p class="card-text text-primary fw-bold">Rp.${product.product_price}</p>
-        </div>
-      </div>`;
-    productGrid.appendChild(col);
-  });
-}
+//         <div class="product-img">
+//           <img class="w-100" src="../${product.product_photo}" alt="" width="100%">
+//         </div>
+//         <div class="card-body">
+//           <span class="badge bg-secondary badge-category">${product.category_name}</span>
+//           <h6 class="card-title mt-2 mb-2">${product.product_name}</h6>
+//           <p class="card-text text-primary fw-bold">Rp.${product.product_price}</p>
+//         </div>
+//       </div>`;
+//     productGrid.appendChild(col);
+//   });
+// }
 
-let cart = [];
-function addToCart(id) {
-  const product = products.find((p) => p.id == id);
-
-  const existing = cart.find((item) => item.id == id);
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ ...product, quantity: 1 });
+ function selectCustomers(){
+    const select = document.getElementById('customer_id');
+    const phone  = select.options[select.selectedIndex].getAttribute('data-phone')
+    document.getElementById('phone').value = phone || "";
   }
-  renderCart();
+
+    function openModal(service){
+      document.getElementById('modal_id').value     = service.id
+      document.getElementById('modal_name').value   = service.name
+      document.getElementById('modal_price').value  = service.price
+      document.getElementById('modal_qty').value    = 1;
+
+      new bootstrap.Modal('#exampleModal').show();
+    }
+
+    let cart = [];
+    
+    function addToCart() {
+    const id      = document.getElementById('modal_id').value;
+    const name    = document.getElementById('modal_name').value; 
+    const price   = parseInt  (document.getElementById('modal_price').value); 
+    const qty     = parseInt(document.getElementById('modal_qty').value); 
+
+
+    const existing = cart.find((item) => item.id == id);
+
+    if (existing) {
+    existing.quantity += qty;
+    } else {
+    cart.push({
+        id, 
+        name, 
+        price, 
+        qty, 
+      });
+    }
+    renderCart();
 }
 
 function renderCart() {
@@ -176,12 +202,12 @@ function renderCart() {
       'cart-item d-flex justify-content-between align-items-center mb-2';
     div.innerHTML = `
             <div>
-            <strong>${item.product_name}</strong>  
-            <small>${item.product_price}</small>  
+            <strong>${item.name}</strong>  
+            <small>${item.price}</small>  
           </div>
           <div class="d-flex align-items-center">
             <button class="btn btn-outline-secondary me-2" onclick="changeQty(${item.id}, -1)">-</button>
-            <span>${item.quantity}</span>
+            <span>${item.qty}</span>
             <button class="btn btn-outline-secondary ms-3" onclick="changeQty(${item.id}, 1)">+</button>  
             <button class="btn btn-sm btn-danger ms-3" onclick="removeItem(${item.id})">
               <i class="bi bi-trash"></i>
@@ -191,6 +217,8 @@ function renderCart() {
   });
   updateTotal();
 }
+
+
 //hapus item dari cart
 function removeItem(id) {
   cart = cart.filter((p) => p.id != id);
@@ -202,19 +230,18 @@ function changeQty(id, x) {
   if (!item) {
     return;
   }
-  item.quantity += x;
-  if (item.quantity <= 0) {
+  item.qty += x;
+  if (item.qty <= 0) {
     alert('minuman harus 1 product');
-    item.quantity += 1;
+    item.qty += 1;
     // cart = filter ((p) => p.id != id);
   }
   renderCart();
 }
+
 function updateTotal() {
   const subtotal = cart.reduce(
-    (sum, item) => sum + item.product_price * item.quantity,
-    0
-  );
+    (sum, item) => sum + item.price * item.qty, 0);
   const tax = subtotal * 0.1;
   const total = tax + subtotal;
 
@@ -245,12 +272,15 @@ async function processPayment() {
   const subtotal = document.querySelector('#subtotal_value').value.trim();
   const tax = document.querySelector('#tax_value').value.trim();
   const grandTotal = document.querySelector('#total_value').value.trim();
+  const costumer_id = document.getElementById('customer_id').value;
+  const end_date = document.getElementById('end_date').value;
   try {
-    const res = await fetch('add-pos.php?payment', {
+    const res = await fetch('add-order.php?payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cart, order_code, subtotal, tax, grandTotal }),
+      body: JSON.stringify({ cart, order_code, subtotal, tax, grandTotal, customer_id, end_date }),
     });
+    console.log(res)
     const data = await res.json();
     if (data.status == 'success') {
       alert('Transaction success');
@@ -268,8 +298,4 @@ async function processPayment() {
 // }, [])
 
 // DomConterrLoaded   : akan meload function pertama kali
-renderProducts();
-document.getElementById('searchProduct').addEventListener('input', function (e) {
-  const searchProduct = e.target.value.toLowerCase();
-  renderProducts(searchProduct);
-});
+

@@ -1,34 +1,40 @@
 <?php
 include '../config/config.php';
+date_default_timezone_set("Asia/Jakarta");
 
-$queryCat   = mysqli_query($config, "SELECT * FROM services");
-$fetchCats  = mysqli_fetch_all($queryCat, MYSQLI_ASSOC);
+$queryServices   = mysqli_query($config, "SELECT * FROM services");
+$rowServices  = mysqli_fetch_all($queryServices, MYSQLI_ASSOC);
+
+$queryCustomers   = mysqli_query($config, "SELECT * FROM customers");
+$rowCustomers  = mysqli_fetch_all($queryCustomers, MYSQLI_ASSOC);
 
 // query product 
 
 // $queryProducts    = mysqli_query($config, "SELECT s.name, p.* FROM products p LEFT JOIN categories c ON c.id = p.category_id");
 // $fetchProducts    = mysqli_fetch_all($queryProducts, MYSQLI_ASSOC);
 
-if (isset($_GET['payment'])) {
+if (isset($_GET['tax'])) {
 
   // transaction
   mysqli_begin_transaction($config);
   $data = json_decode(file_get_contents('php://input'), true);
 
   $cart = $data["cart"];
-  $subtotal = array_reduce($cart, function ($sum, $item) {
-    return $sum + ($item['product_price'] * $item['quantity']);
-  }, 0);
+
+
   $tax            = $data['tax'];
   $orderAmounth   = $data['grandTotal'];
   $orderCode      = $data['order_code'];
-  $orderDate      = date("Y-m-d H:1:s");
+  $end_date       = $data['end_date'];
+  $customer_id    = $data['customer_id'];
   $orderChange    = 0;
+  $orderPay       = 0;
   $orderStatus    = 1;
   $subtotal       = $data['subtotal'];
 
   try {
-    $insertOrder    = mysqli_query($config, "INSERT INTO trans_orders (order_code, order_date, order_amount, order_subtotal, order_status) VALUES ('$orderCode','$orderDate', '$orderAmounth', '$subtotal', '$orderStatus')");
+    $insertOrder    = mysqli_query($config, "INSERT INTO trans_orders (order_code, order_end_date, order_total, order_pay, order_change, order_tax, order_status) 
+    VALUES ('$orderCode','$end_date', '$orderAmounth', '$orderPay', '$orderChange', '$tax', '$orderStatus')");
 
     if (!$insertOrder) {
       throw new Exception("Insert failed to table orders", mysqli_error($config));
@@ -36,12 +42,13 @@ if (isset($_GET['payment'])) {
     $idOrder        = mysqli_insert_id($config);
 
     foreach ($cart as $v) {
-      $product_id   = $v['id'];
-      $qty          = $v['quantity'];
-      $order_price  = $v['product_price'];
-      $subtotal     = $qty * $order_price;
+      $service_id   = $v['id'];
+      $qty          = $v['qty'];
+      $order_price  = $v['price'];
+      $subtotal     = $qty * $price;
 
-      $insertOrderDetails = mysqli_query($config, "INSERT INTO trans_order_details (order_id, product_id, qty, order_price, order_subtotal) VALUES ('$idOrder','$product_id', '$qty', '$order_price', '$subtotal')");
+      $insertOrderDetails = mysqli_query($config, "INSERT INTO trans_order_details (order_id, service_id, qty, price, subtotal) 
+      VALUES ('$idOrder', '$service_id', '$qty', '$order_price', '$subtotal')");
       if (!$insertOrderDetails) {
         throw new Exception("Insert failed to table order details", mysqli_error($config));
       }
@@ -71,7 +78,7 @@ $row = mysqli_fetch_assoc($orderNumbers);
 
 $nextId = $row ? $row['id'] + 1 : 1;
 // STR_PAD
-$order_code = "ORD-" . date('dmY') . str_pad($nextId, 4, "0", STR_PAD_LEFT );
+$order_code = "ORD-" . date('dmY') . str_pad($nextId, 4, "0", STR_PAD_LEFT);
 // if ($row) {
 //   $nextId   = $row['id'] + 1;
 // } else {
@@ -85,7 +92,7 @@ $order_code = "ORD-" . date('dmY') . str_pad($nextId, 4, "0", STR_PAD_LEFT );
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Point Of Sale</title>
+  <title>Laundry PPKD | JP</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
   <link rel="stylesheet" href="../assets/css/aldo.css">
@@ -97,24 +104,104 @@ $order_code = "ORD-" . date('dmY') . str_pad($nextId, 4, "0", STR_PAD_LEFT );
 
   <!-- container-fluid -->
   <div class="container-fluid container-pos">
-    <div id="card"></div>
     <div class="row h-100">
       <div class="col-md-7 product-section">
-        <div class="mb-4">
-          <h4 class="mb-3" id="product-title">
-            <i class="fas fa-store"></i>
-            Product
-          </h4>
-          <input type="text" id="searchProduct"
-            class="form-control search-box" placeholder="Find Product...">
+        <div class="card shadow-sm mb-3" style="border-radius: 12px;">
+          <div class="card-header text-center">
+            <b>Customer</b> 
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="" class="form-label">
+                  Customer Name
+                </label>
+                <select name="customer_id" id="customer_id" 
+                class="form-control" onchange="selectCustomers()" style="border-radius: 12px; background-color: #e3f2fd;">
+                  <option value="">Select One</option>
+                  <?php foreach($rowCustomers as $customer): ?>
+                  <option data-phone="<?php echo $customer['phone'] ?>" 
+                  value="<?php echo $customer['id'] ?>">
+                    <?php echo $customer['name'] ?>
+                  </option>
+                  <?php endforeach ?>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="" class="form-label" >
+                  Phone Number
+                </label>
+                <input type="text" class="form-control" style="border-radius: 12px; background-color: #e3f2fd;"
+                  placeholder="Phone Number" id="phone" readonly>
+              </div>
+              <div class="col-md-6">
+                <label for="" class="form-label" style="border-radius: 12px;">
+                  End Date
+                </label>
+                <input type="date" name="end_date" id="end_date" style="border-radius: 12px; background-color: #e3f2fd;" 
+                  class="form-control">
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="mb-4">
-          <button class="btn btn-primary category-btn active" onclick="filterCategory('all', this)">All Menu</button>
-          <?php foreach ($fetchCats as $cat): ?>
-            <!-- <button class="btn btn-outline-primary category-btn" onclick="filterCategory('<?php echo $cat['services'] ?>', this)"><?php echo $cat['services'] ?></button> -->
-          <?php endforeach  ?>
+        <div class="card shadow-sm mb-3" style="border-radius: 12px;">
+          <div class="card-header text-center">
+            <b>Laundry Service</b>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <?php foreach($rowServices as $service) : ?>
+              <div class="col-md-4 mb-3">
+                <div class="card service-card" style="border-radius: 12px; padding: 10px;" 
+                onclick="openModal(<?php echo htmlspecialchars(json_encode($service)) ?>)">
+
+                  <h6><?php echo $service['name'] ?></h6>
+                  <small class="text-muted">Rp. <?php echo $service['price'] ?> /kg</small>
+                </div>
+              </div>
+              <?php endforeach ?>
+              
+            </div>
+          </div>
         </div>
-        <div class="row" id="productGrid"></div>
+
+        <!-- Button trigger modal -->
+        <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Launch demo modal
+        </button> -->
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <input type="hidden" id="modal_id"    name="modal_id">
+                <input type="hidden" id="modal_price" name="modal_price">
+                <input type="hidden" id="modal_type"  name="modal_type">
+
+                <div class="mb-3">
+                  <label for="" class="form-label">Service Name</label>
+                  <input type="text" id="modal_name"
+                  class="form-control" readonly>
+                </div>
+                <div class="mb-3">
+                  <label for="" class="form-label">Weight / Qty</label>
+                  <input type="number" id="modal_qty"
+                  class="form-control" placeholder="Weight / Qty">
+                </div>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="addToCart()">Add to Cart</button>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
       <div class="col-md-5 cart-section">
@@ -151,7 +238,7 @@ $order_code = "ORD-" . date('dmY') . str_pad($nextId, 4, "0", STR_PAD_LEFT );
           </div>
           <div class="row g-2">
             <div class="col-md-6">
-              <button class="btn btn-checkout btn-outline-danger w-100" id="clearCart">
+              <button class="btn btn-clear-cart btn-outline-danger w-100" id="clearCart">
                 <i class="bi bi-trash"></i> Clear Cart
               </button>
             </div>
@@ -172,7 +259,7 @@ $order_code = "ORD-" . date('dmY') . str_pad($nextId, 4, "0", STR_PAD_LEFT );
 
 
   <script>
-    const products = <?php echo json_encode($fetchProducts); ?>
+   
   </script>
 
   <script src="../assets/js/aldo.js"></script>
