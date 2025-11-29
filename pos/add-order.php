@@ -30,7 +30,7 @@ if (isset($_GET['payment'])) {
   $customer_id    = $data["customer_id"];
   $orderChange    = $data["change"];
   $orderPay       = $data["pay"];
-  $orderStatus    = 1;
+  $orderStatus    = 0;
   $subtotal       = $data['subtotal'];
 
   try {

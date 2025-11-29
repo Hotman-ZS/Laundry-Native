@@ -32,7 +32,9 @@ body {
 
 .card-body {
   background-color: #99d1ff;
-  box-shadow: 0 0 3px #e5e5e5;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10), 
+              0 4px 16px rgba(0,0,0,0.05);
+
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
 }

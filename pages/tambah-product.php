@@ -7,7 +7,7 @@ $categories = mysqli_fetch_all($selectCategory, MYSQLI_ASSOC);
 $id   = isset($_GET['edit']) ? $_GET['edit'] : '';
 $s_product  = mysqli_query($koneksi, "SELECT * FROM products WHERE id = '$id' ");
 $p  = mysqli_fetch_assoc($s_product);
-// var_dump($product);
+// var_dump($product); 
 
 if (isset($_POST['simpan'])) {
   $c_id           = $_POST['category_id'];

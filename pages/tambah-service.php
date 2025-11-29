@@ -1,10 +1,9 @@
 <?php
 
-//PRODUCTS : 
+//SERVICES: 
 $id   = isset($_GET['edit']) ? $_GET['edit'] : '';
 $services  = mysqli_query($config, "SELECT * FROM services WHERE id = '$id' ");
 $s  = mysqli_fetch_assoc($services);
-// var_dump($product);
 
 if (isset($_POST['simpan'])) {
   $name         = $_POST['name'];

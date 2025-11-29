@@ -187,16 +187,16 @@ $taxs     = mysqli_fetch_assoc($queryTax);
         <span>Rp. <?php echo $row['order_total'] ?></span>
       </div>
     </div>
-    <!-- <div class="payment">
+    <div class="payment">
       <div class="total-row">
         <span>Cash</span>
-        <span>Rp. 100.000</span>
+        <span><?php echo "Rp. " . number_format($row['order_pay'], 0, ',',',') ?> </span>
       </div>
       <div class="total-row">
         <span>Change</span>
-        <span>Rp. 50.000</span>
+        <span><?php echo "Rp. " . number_format($row['order_change'], 0, ',',',') ?> </span>
       </div>
-    </div> -->
+    </div>
   </div>
   <hr>
 

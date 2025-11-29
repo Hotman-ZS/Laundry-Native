@@ -79,7 +79,7 @@ if (isset($_POST['simpan'])) {
             <input type="text" name="email" class="form-control" placeholder="Enter your email" required value="<?php echo $rowEdit['email'] ?? '' ?>">
           </div>
           <div class="mb-3">
-            <label for="password" class="form-label">Password * <small>Kosongkan jika tidak ingin mengubah</small></label>
+            <label for="password" class="form-label">Password *</label>
             <br>
             <input type="password" name="password" class="form-control" placeholder="Enter your password">
           </div>
