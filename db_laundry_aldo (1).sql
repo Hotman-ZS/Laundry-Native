@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 26 Nov 2025 pada 01.49
+-- Waktu pembuatan: 29 Nov 2025 pada 12.15
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -85,12 +85,16 @@ CREATE TABLE `level_menus` (
 --
 
 INSERT INTO `level_menus` (`id`, `level_id`, `menu_id`, `created_at`, `updated_at`) VALUES
-(10, 1, 6, '2025-11-25 07:45:49', NULL),
-(11, 1, 5, '2025-11-25 07:45:49', NULL),
-(12, 1, 4, '2025-11-25 07:45:49', NULL),
-(13, 1, 3, '2025-11-25 07:45:49', NULL),
-(14, 1, 2, '2025-11-25 07:45:49', NULL),
-(15, 1, 1, '2025-11-25 07:45:49', NULL);
+(31, 3, 7, '2025-11-29 08:17:27', NULL),
+(32, 1, 8, '2025-11-29 08:17:49', NULL),
+(33, 1, 7, '2025-11-29 08:17:49', NULL),
+(34, 1, 6, '2025-11-29 08:17:49', NULL),
+(35, 1, 5, '2025-11-29 08:17:49', NULL),
+(36, 1, 4, '2025-11-29 08:17:49', NULL),
+(37, 1, 3, '2025-11-29 08:17:49', NULL),
+(38, 1, 2, '2025-11-29 08:17:49', NULL),
+(39, 1, 1, '2025-11-29 08:17:49', NULL),
+(41, 2, 8, '2025-11-29 10:54:07', NULL);
 
 -- --------------------------------------------------------
 
@@ -118,7 +122,9 @@ INSERT INTO `menus` (`id`, `name`, `icon`, `link`, `orders`, `created_at`, `upda
 (3, 'Service', 'bi bi-book-fill', 'service', 3, '2025-11-25 02:33:36', '2025-11-25 07:50:03'),
 (4, 'Customer', 'bi bi-people-fill', 'customer', 2, '2025-11-25 03:47:48', '2025-11-25 07:41:43'),
 (5, 'Level', 'bi bi-water', 'level', 5, '2025-11-25 03:48:26', '2025-11-25 07:41:38'),
-(6, 'Dashboard', 'bi bi-database-fill', 'dashboard', 1, '2025-11-25 07:37:17', '2025-11-25 07:47:36');
+(6, 'Dashboard', 'bi bi-database-fill', 'dashboard', 1, '2025-11-25 07:37:17', '2025-11-25 07:47:36'),
+(7, 'Report', 'bi bi-envelope-fill', 'report', 8, '2025-11-29 07:45:45', '2025-11-29 08:11:22'),
+(8, 'Order', 'bi bi-table', 'order', 7, '2025-11-29 08:09:52', '2025-11-29 08:10:58');
 
 -- --------------------------------------------------------
 
@@ -140,7 +146,31 @@ CREATE TABLE `services` (
 --
 
 INSERT INTO `services` (`id`, `name`, `price`, `description`, `created_at`, `updated_at`) VALUES
-(4, 'Cuci dan Gosok', 24000, 'Cuci gosok dengan sepenuh hati', '2025-11-24 07:48:16', NULL);
+(4, 'Cuci dan Gosok', 5000, '            Cuci gosok dengan sepenuh hati          ', '2025-11-24 07:48:16', '2025-11-29 08:19:23'),
+(5, 'Hanya Cuci', 4500, 'hanya cuci            ', '2025-11-29 08:20:08', NULL),
+(6, 'Hanya Gosok', 5000, '                  hanya gosok    ', '2025-11-29 08:21:00', NULL),
+(7, 'Selimut', 7000, 'Laundry Besar', '2025-11-29 08:23:58', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `taxs`
+--
+
+CREATE TABLE `taxs` (
+  `id` int(11) NOT NULL,
+  `percent` int(11) NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `taxs`
+--
+
+INSERT INTO `taxs` (`id`, `percent`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 10, 1, '2025-11-26 03:02:54', NULL);
 
 -- --------------------------------------------------------
 
@@ -162,6 +192,15 @@ CREATE TABLE `trans_orders` (
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data untuk tabel `trans_orders`
+--
+
+INSERT INTO `trans_orders` (`id`, `customer_id`, `order_code`, `order_end_date`, `order_status`, `order_pay`, `order_change`, `order_tax`, `order_total`, `created_at`, `updated_at`) VALUES
+(2, 1, 'ORD-291120250001', '2025-11-04', 1, 27000, 600, 2400, 26400, '2025-11-29 07:43:31', NULL),
+(3, 1, 'ORD-291120250003', '2025-11-29', 0, 11000, 550, 950, 10450, '2025-11-29 09:16:54', '2025-11-29 10:51:52'),
+(4, 1, 'ORD-291120250004', '2025-11-29', 0, 14000, 800, 1200, 13200, '2025-11-29 10:55:39', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -173,10 +212,23 @@ CREATE TABLE `trans_order_details` (
   `order_id` int(11) NOT NULL,
   `service_id` int(11) NOT NULL,
   `qty` int(11) NOT NULL,
+  `price` int(11) NOT NULL,
   `subtotal` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `trans_order_details`
+--
+
+INSERT INTO `trans_order_details` (`id`, `order_id`, `service_id`, `qty`, `price`, `subtotal`, `created_at`, `updated_at`) VALUES
+(1, 1, 4, 1, 24000, 24000, '2025-11-29 07:21:21', NULL),
+(2, 2, 4, 1, 24000, 24000, '2025-11-29 07:43:31', NULL),
+(3, 3, 5, 1, 4500, 4500, '2025-11-29 09:16:54', NULL),
+(4, 3, 6, 1, 5000, 5000, '2025-11-29 09:16:54', NULL),
+(5, 4, 7, 1, 7000, 7000, '2025-11-29 10:55:39', NULL),
+(6, 4, 6, 1, 5000, 5000, '2025-11-29 10:55:39', NULL);
 
 -- --------------------------------------------------------
 
@@ -199,9 +251,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `level_id`, `name`, `email`, `password`, `created_at`, `updated_at`) VALUES
-(1, 1, 'admin', 'admin@gmail.com', '40bd001563085fc35165329ea1ff5c5ecbdbbeef', '2025-11-24 02:57:51', '2025-11-25 05:10:09'),
+(1, 1, 'admin', 'admin@gmail.com', '40bd001563085fc35165329ea1ff5c5ecbdbbeef', '2025-11-24 02:57:51', '2025-11-29 06:18:52'),
 (2, 2, 'Operator', 'operator@gmail.com', '40bd001563085fc35165329ea1ff5c5ecbdbbeef', '2025-11-25 06:43:40', NULL),
-(3, 3, 'Pimpinan', 'pimpinan@gmail.com', '40bd001563085fc35165329ea1ff5c5ecbdbbeef', '2025-11-26 00:38:17', NULL);
+(3, 3, 'Pimpinan', 'pimpinan@gmail.com', '8cb2237d0679ca88db6464eac60da96345513964', '2025-11-29 07:33:52', NULL);
 
 --
 -- Indexes for dumped tables
@@ -238,6 +290,18 @@ ALTER TABLE `services`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indeks untuk tabel `taxs`
+--
+ALTER TABLE `taxs`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `trans_orders`
+--
+ALTER TABLE `trans_orders`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indeks untuk tabel `trans_order_details`
 --
 ALTER TABLE `trans_order_details`
@@ -269,25 +333,37 @@ ALTER TABLE `levels`
 -- AUTO_INCREMENT untuk tabel `level_menus`
 --
 ALTER TABLE `level_menus`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT untuk tabel `menus`
 --
 ALTER TABLE `menus`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT untuk tabel `services`
 --
 ALTER TABLE `services`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
+-- AUTO_INCREMENT untuk tabel `taxs`
+--
+ALTER TABLE `taxs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `trans_orders`
+--
+ALTER TABLE `trans_orders`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT untuk tabel `trans_order_details`
 --
 ALTER TABLE `trans_order_details`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT untuk tabel `users`

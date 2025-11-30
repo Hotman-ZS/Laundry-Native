@@ -88,6 +88,8 @@
 // card.appendChild(h3);
 // card.appendChild(p);
 // // foreach($buttons as $btn){}
+
+
 function selectCustomers(){
   const select = document.getElementById('customer_id');
   const phone  = select.options[select.selectedIndex].getAttribute('data-phone')
@@ -242,7 +244,7 @@ function calculateChange(){
 
   const change = pay - total;
   if (change < 0) change = 0;
-  document.getElementById("change").value = change > 0 ? change.toLocaleString() : "0";
+  document.getElementById("change").value = change;
 }
 // useEffect(() => {
 // }, [])

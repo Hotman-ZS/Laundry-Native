@@ -28,12 +28,38 @@ checkLogin();
 //   }
 // }
 
-//   if(!$allowed_role) {
-//     echo "<h1 class='center'>Access Failed!!</h1>";
-//     echo "anda tidak memiliki hak akses ke halaman ini" . ucfirst($currentPage);
-//     echo "<a href='home.php?page=dashboard'>Back to Dashboard</a>";
-//     exit;
-//   }
+$currentPage = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
+
+$level_id = $_SESSION['LEVEL_ID'] ?? '';
+
+$allowed_role = false;
+
+// Kalau ADMIN (level_id = 1), langsung lolos semua halaman
+if ($level_id == 1) {
+  $allowed_role = true;
+} else {
+  // baru lakukan pengecekan ke database untuk selain admin
+  $query = mysqli_query($config, "SELECT * FROM menus 
+    JOIN level_menus ON level_menus.menu_id = menus.id 
+    WHERE level_id = '$level_id' ");
+      $rows = mysqli_fetch_all($query, MYSQLI_ASSOC);
+
+      foreach ($rows as $row) {
+      if ($row['link'] == $currentPage) {
+      $allowed_role = true;
+      break;
+    }
+  }
+}
+
+
+
+if (!$allowed_role) {
+  echo "<h1 class='center'>Access Failed!!</h1>";
+  echo "anda tidak memiliki hak akses ke halaman ini" . ucfirst($currentPage);
+  echo "<a href='home.php?page=dashboard'>Back to Dashboard</a>";
+  exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -102,8 +128,8 @@ checkLogin();
   </main><!-- End #main -->
 
   <!-- ======= Footer ======= -->
-<?php include 'inc/footer.php' ?>
-<!-- End Footer -->
+  <?php include 'inc/footer.php' ?>
+  <!-- End Footer -->
 
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 

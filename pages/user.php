@@ -3,7 +3,7 @@
 // include_once;
 // require_once;
 // require;
-// require_once 'config/koneksi.php';
+require_once 'config/config.php';
 
 $query = mysqli_query($config, "SELECT l.name as level_name, u.* FROM users u
 LEFT JOIN levels l ON l.id = u.level_id ORDER BY u.id DESC");
